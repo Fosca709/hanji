@@ -19,7 +19,7 @@ PACKAGE_PRIORITY="${PACKAGE_PRIORITY:-optional}"
 PACKAGE_MAINTAINER="${PACKAGE_MAINTAINER:-Hanji <noreply@example.com>}"
 PACKAGE_DESCRIPTION="${PACKAGE_DESCRIPTION:-Hanji sticky note app}"
 PACKAGE_LONG_DESCRIPTION="${PACKAGE_LONG_DESCRIPTION:-A tiny sticky note desktop app.}"
-PACKAGE_DEPENDS="${PACKAGE_DEPENDS:-libgl1, libxkbcommon0}"
+PACKAGE_DEPENDS="${PACKAGE_DEPENDS:-libgl1, libxkbcommon0, libdbus-1-3, libglib2.0-0}"
 PACKAGE_FILENAME="${PACKAGE_NAME}_${PACKAGE_VERSION}_${PACKAGE_ARCH}.deb"
 
 if ! command -v dpkg-deb >/dev/null 2>&1; then

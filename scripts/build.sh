@@ -21,7 +21,7 @@ uv run nuitka \
     --onefile \
     --assume-yes-for-downloads \
     --enable-plugin=pyside6 \
-    --include-qt-plugins=qml \
+    --include-qt-plugins=qml,platforminputcontexts \
     --linux-onefile-icon="$ROOT_DIR/assets/icon.svg" \
     --include-data-dir="$ROOT_DIR/qml=qml" \
     --include-data-dir="$ROOT_DIR/assets=assets" \
