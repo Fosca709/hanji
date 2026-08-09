@@ -4,6 +4,7 @@ import (
 	_ "embed"
 	"image/color"
 	"os"
+	"reflect"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -29,6 +30,12 @@ var hanjiBackground = color.NRGBA{R: 0xF8, G: 0xE5, B: 0x8C, A: 0xFF}
 func (t hanjiTheme) Color(name fyne.ThemeColorName, variant fyne.ThemeVariant) color.Color {
 	if name == theme.ColorNameBackground {
 		return hanjiBackground
+	}
+	if name == theme.ColorNameMenuBackground {
+		return color.White
+	}
+	if name == theme.ColorNameForeground {
+		return color.Black
 	}
 	if name == theme.ColorNamePrimary {
 		return color.Black
@@ -56,6 +63,40 @@ func (t hanjiEntryTheme) Size(name fyne.ThemeSizeName) float32 {
 
 type hanjiEntry struct {
 	widget.Entry
+}
+
+func (e *hanjiEntry) TappedSecondary(pe *fyne.PointEvent) {
+	canUndo, canRedo := e.undoAvailability()
+
+	undoItem := fyne.NewMenuItem("Undo", e.Undo)
+	undoItem.Disabled = !canUndo
+	redoItem := fyne.NewMenuItem("Redo", e.Redo)
+	redoItem.Disabled = !canRedo
+
+	app := fyne.CurrentApp()
+	canvas := app.Driver().CanvasForObject(e)
+	canvas.Focus(e)
+	widget.ShowPopUpMenuAtPosition(
+		fyne.NewMenu("", undoItem, redoItem),
+		canvas,
+		pe.AbsolutePosition,
+	)
+}
+
+func (e *hanjiEntry) undoAvailability() (canUndo, canRedo bool) {
+	stack := reflect.ValueOf(&e.Entry).Elem().FieldByName("undoStack")
+	if !stack.IsValid() {
+		return false, false
+	}
+
+	index := stack.FieldByName("index")
+	items := stack.FieldByName("items")
+	if !index.IsValid() || !items.IsValid() {
+		return false, false
+	}
+
+	position := int(index.Int())
+	return position > 0, position < items.Len()
 }
 
 func newHanjiEntry() *container.ThemeOverride {
