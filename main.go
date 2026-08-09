@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"image/color"
 
 	"fyne.io/fyne/v2"
@@ -10,6 +11,9 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
+
+//go:embed assets/icon.svg
+var iconData []byte
 
 type hanjiEntryTheme struct {
 	fyne.Theme
@@ -99,6 +103,7 @@ func (r *hanjiEntryRenderer) hideBorder() {
 
 func main() {
 	a := app.NewWithID("Hanji")
+	a.SetIcon(fyne.NewStaticResource("icon.svg", iconData))
 	a.Settings().SetTheme(hanjiTheme{Theme: theme.DefaultTheme()})
 	w := a.NewWindow("Hanji")
 
