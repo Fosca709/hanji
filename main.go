@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"image/color"
+	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -102,6 +103,12 @@ func (r *hanjiEntryRenderer) hideBorder() {
 }
 
 func main() {
+	// Fyne's GLFW backend needs XIM configured to receive composed Korean input
+	// from fcitx5. This is intentionally fcitx5-specific for this personal app.
+	if os.Getenv("XMODIFIERS") == "" {
+		_ = os.Setenv("XMODIFIERS", "@im=fcitx")
+	}
+
 	a := app.NewWithID("Hanji")
 	a.SetIcon(fyne.NewStaticResource("icon.svg", iconData))
 	a.Settings().SetTheme(hanjiTheme{Theme: theme.DefaultTheme()})
