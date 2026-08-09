@@ -3,6 +3,7 @@ package main
 import (
 	_ "embed"
 	"image/color"
+	"log"
 	"os"
 	"reflect"
 
@@ -10,6 +11,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 )
@@ -63,11 +65,49 @@ func (t hanjiEntryTheme) Size(name fyne.ThemeSizeName) float32 {
 
 type hanjiEntry struct {
 	widget.Entry
+	alwaysOnTop bool
+}
+
+type menuToggleIndicator bool
+
+func (i menuToggleIndicator) ShortcutName() string {
+	return "AlwaysOnTopIndicator"
+}
+
+func (i menuToggleIndicator) Key() fyne.KeyName {
+	if i {
+		return fyne.KeyName("▣")
+	}
+	return fyne.KeyName("□")
+}
+
+func (menuToggleIndicator) Mod() fyne.KeyModifier {
+	return 0
+}
+
+func (e *hanjiEntry) toggleAlwaysOnTop() {
+	enabled := !e.alwaysOnTop
+	if err := setAlwaysOnTop(enabled); err != nil {
+		log.Printf("could not change always-on-top state: %v", err)
+		return
+	}
+	e.alwaysOnTop = enabled
+}
+
+func (e *hanjiEntry) TypedShortcut(shortcut fyne.Shortcut) {
+	if keyboard, ok := shortcut.(fyne.KeyboardShortcut); ok &&
+		keyboard.Key() == fyne.KeyQ && keyboard.Mod() == fyne.KeyModifierControl {
+		e.toggleAlwaysOnTop()
+		return
+	}
+	e.Entry.TypedShortcut(shortcut)
 }
 
 func (e *hanjiEntry) TappedSecondary(pe *fyne.PointEvent) {
 	canUndo, canRedo := e.undoAvailability()
 
+	alwaysOnTopItem := fyne.NewMenuItem("Always on Top", e.toggleAlwaysOnTop)
+	alwaysOnTopItem.Shortcut = menuToggleIndicator(e.alwaysOnTop)
 	undoItem := fyne.NewMenuItem("Undo", e.Undo)
 	undoItem.Disabled = !canUndo
 	redoItem := fyne.NewMenuItem("Redo", e.Redo)
@@ -77,7 +117,7 @@ func (e *hanjiEntry) TappedSecondary(pe *fyne.PointEvent) {
 	canvas := app.Driver().CanvasForObject(e)
 	canvas.Focus(e)
 	widget.ShowPopUpMenuAtPosition(
-		fyne.NewMenu("", undoItem, redoItem),
+		fyne.NewMenu("", alwaysOnTopItem, undoItem, redoItem),
 		canvas,
 		pe.AbsolutePosition,
 	)
@@ -99,14 +139,14 @@ func (e *hanjiEntry) undoAvailability() (canUndo, canRedo bool) {
 	return position > 0, position < items.Len()
 }
 
-func newHanjiEntry() *container.ThemeOverride {
+func newHanjiEntry() (*container.ThemeOverride, *hanjiEntry) {
 	entry := &hanjiEntry{}
 	entry.MultiLine = true
 	entry.Wrapping = fyne.TextWrapWord
 	entry.ExtendBaseWidget(entry)
 
 	entryTheme := hanjiEntryTheme{Theme: theme.DefaultTheme()}
-	return container.NewThemeOverride(entry, entryTheme)
+	return container.NewThemeOverride(entry, entryTheme), entry
 }
 
 func (e *hanjiEntry) CreateRenderer() fyne.WidgetRenderer {
@@ -155,7 +195,14 @@ func main() {
 	a.Settings().SetTheme(hanjiTheme{Theme: theme.DefaultTheme()})
 	w := a.NewWindow("Hanji")
 
-	note := newHanjiEntry()
+	note, entry := newHanjiEntry()
+	alwaysOnTopShortcut := &desktop.CustomShortcut{
+		KeyName:  fyne.KeyQ,
+		Modifier: fyne.KeyModifierControl,
+	}
+	w.Canvas().AddShortcut(alwaysOnTopShortcut, func(fyne.Shortcut) {
+		entry.toggleAlwaysOnTop()
+	})
 
 	w.SetContent(note)
 	w.Resize(fyne.NewSize(350, 350))
