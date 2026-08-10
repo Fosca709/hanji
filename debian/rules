@@ -1,0 +1,31 @@
+#!/usr/bin/make -f
+
+export CGO_ENABLED = 1
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	@command -v go >/dev/null 2>&1 || { \
+		echo "error: Go is required to build the Debian package" >&2; \
+		exit 1; \
+	}
+	mkdir -p build/package
+	go build -trimpath -buildmode=pie -ldflags="-s -w -buildid=" \
+		-o build/package/hanji .
+
+override_dh_auto_install:
+	install -Dm755 build/package/hanji \
+		debian/hanji/usr/bin/hanji
+	install -Dm644 debian/hanji.desktop \
+		debian/hanji/usr/share/applications/hanji.desktop
+	install -Dm644 assets/icon.svg \
+		debian/hanji/usr/share/icons/hicolor/scalable/apps/hanji.svg
+
+override_dh_auto_clean:
+	dh_auto_clean
+	rm -rf build/package debian/build
+
+override_dh_builddeb:
+	mkdir -p build/debian
+	dh_builddeb --destdir=build/debian
