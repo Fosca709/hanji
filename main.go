@@ -142,7 +142,7 @@ func (e *hanjiEntry) undoAvailability() (canUndo, canRedo bool) {
 func newHanjiEntry() (*container.ThemeOverride, *hanjiEntry) {
 	entry := &hanjiEntry{}
 	entry.MultiLine = true
-	entry.Wrapping = fyne.TextWrapWord
+	entry.Wrapping = fyne.TextWrapBreak
 	entry.ExtendBaseWidget(entry)
 
 	entryTheme := hanjiEntryTheme{Theme: theme.DefaultTheme()}
