@@ -8,13 +8,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-find_package(Qt6 6.2 REQUIRED COMPONENTS Widgets)
+find_package(Qt6 6.2 REQUIRED COMPONENTS DBus Widgets)
 
 qt_add_executable(hanji
     src/main.cpp
     assets/resources.qrc
 )
 
-target_link_libraries(hanji PRIVATE Qt6::Widgets)
+target_link_libraries(hanji PRIVATE Qt6::DBus Qt6::Widgets)
 
 install(TARGETS hanji RUNTIME DESTINATION bin)
