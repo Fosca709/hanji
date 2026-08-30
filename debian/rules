@@ -1,0 +1,18 @@
+#!/usr/bin/make -f
+
+%:
+	dh $@ --buildsystem=cmake+ninja
+
+override_dh_auto_test:
+	@:
+
+override_dh_auto_install:
+	dh_auto_install --buildsystem=cmake+ninja
+	install -Dm644 debian/hanji.desktop \
+		debian/hanji/usr/share/applications/hanji.desktop
+	install -Dm644 assets/icon.svg \
+		debian/hanji/usr/share/icons/hicolor/scalable/apps/hanji.svg
+
+override_dh_builddeb:
+	mkdir -p build/debian
+	dh_builddeb --destdir=build/debian

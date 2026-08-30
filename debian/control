@@ -1,0 +1,16 @@
+Source: hanji
+Section: utils
+Priority: optional
+Maintainer: Fosca709 <Fosca709@gmail.com>
+Build-Depends:
+ cmake,
+ debhelper-compat (= 13),
+ ninja-build,
+ qt6-base-dev,
+Standards-Version: 4.7.2
+Rules-Requires-Root: no
+
+Package: hanji
+Architecture: any
+Depends: ${misc:Depends}, ${shlibs:Depends}
+Description: Sticky note app
