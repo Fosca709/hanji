@@ -1,3 +1,10 @@
+hanji (0.2.1) unstable; urgency=medium
+
+  * Improve title bar icon rendering.
+  * Refine the vertical scrollbar appearance.
+
+ -- Fosca709 <Fosca709@gmail.com>  Mon, 31 Aug 2026 15:55:01 +0900
+
 hanji (0.2.0) unstable; urgency=medium
 
   * Migrate the application from Go and Fyne to Qt 6 Widgets.
