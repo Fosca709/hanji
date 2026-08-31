@@ -89,11 +89,15 @@ int main(int argc, char *argv[])
 {
     QApplication application(argc, argv);
     application.setApplicationName(QStringLiteral("Hanji"));
-    application.setWindowIcon(QIcon(QStringLiteral(":/assets/icon.svg")));
+
+    QIcon applicationIcon;
+    applicationIcon.addFile(QStringLiteral(":/assets/icon-16.png"), QSize(16, 16));
+    applicationIcon.addFile(QStringLiteral(":/assets/icon-32.png"), QSize(32, 32));
+    application.setWindowIcon(applicationIcon);
 
     NoteEditor editor;
     editor.setWindowTitle(QStringLiteral("Hanji"));
-    editor.setWindowIcon(QIcon(QStringLiteral(":/assets/icon.svg")));
+    editor.setWindowIcon(applicationIcon);
     editor.resize(350, 350);
     editor.setLineWrapMode(QPlainTextEdit::WidgetWidth);
     editor.setWordWrapMode(QTextOption::WrapAtWordBoundaryOrAnywhere);
